@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'HR Back Pay / Retroactive Pay',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Human Resources/Payroll',
     'summary': 'Version-based back pay / retroactive salary adjustments with payslip integration',
     'description': """
