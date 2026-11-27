@@ -52,15 +52,15 @@ def _rule_defs(env):
             'name': 'Back Pay Employee Pension 7% (የተከማቸ ጭማሪ ጡረታ 7% - ለሪፖርት)',
             'sequence': 181,
             'category_id': summary_category.id,
+            # No getattr(): salary-rule safe_eval does not expose it
             'condition_python': (
-                "result = bool(getattr(version, 'has_pension', True) and "
+                "result = bool(version.has_pension and "
                 "version.back_pay_pension_total and "
                 "version.back_pay_pension_total > 0 and "
                 "(version.is_back_pay_approved or not version.back_pay_months))"
             ),
             'amount_python_compute': (
-                "result = version.back_pay_pension_total "
-                "if getattr(version, 'has_pension', True) else 0.0"
+                "result = version.back_pay_pension_total if version.has_pension else 0.0"
             ),
         },
     ]
