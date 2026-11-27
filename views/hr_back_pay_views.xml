@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Employee form: Back Pay lives on the Payroll tab (versions replace contracts in 19.0) -->
+    <record id="hr_employee_view_form_back_pay" model="ir.ui.view">
+        <field name="name">hr.employee.form.back.pay</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <page name="payroll_information" position="after">
+                <page string="Back Pay (የተከማቸ ጭማሪ)" name="back_pay"
+                      groups="hr_payroll.group_hr_payroll_user">
+                    <field name="currency_id" invisible="1"/>
+                    <separator string="Back Pay &amp; Retroactive Adjustments (የተከማቸ ጭማሪ)"/>
+                    <div class="border rounded p-2 bg-white mb-2 shadow-sm">
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label for="back_pay_months" string="Retroactive Months" class="small fw-bold"/>
+                                <field name="back_pay_months" class="form-control form-control-sm"/>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="back_pay_previous_net" string="Previous Net / Month" class="small fw-bold"/>
+                                    <button name="action_fetch_previous_payslip" type="object"
+                                            string="Fetch Last Slip" class="btn btn-link btn-sm p-0 text-primary"
+                                            title="Fetch net, tax, and pension from employee's latest payslip"/>
+                                </div>
+                                <field name="back_pay_previous_net" widget="monetary" class="form-control form-control-sm"/>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-2" invisible="back_pay_months == 0">
+                            <div class="col-6">
+                                <div class="text-muted small">New Corrected Net</div>
+                                <div class="fw-bold text-dark">
+                                    <field name="back_pay_new_net" widget="monetary" readonly="1"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-muted small">Monthly Difference</div>
+                                <div class="fw-bold text-primary">
+                                    + <field name="back_pay_monthly_diff" widget="monetary" readonly="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-2 mb-2 rounded bg-light border" invisible="back_pay_months == 0">
+                            <div class="small fw-bold text-muted mb-1">
+                                <i class="fa fa-institution me-1 text-secondary"/>
+                                Government Reporting Breakdown (Not deducted from Net):
+                            </div>
+                            <div class="row g-2 small">
+                                <div class="col-6">
+                                    <span class="text-muted">Back Pay Income Tax: </span>
+                                    <span class="fw-bold text-dark">
+                                        <field name="back_pay_tax_total" widget="monetary" readonly="1"/>
+                                    </span>
+                                    <div class="text-muted fst-italic" style="font-size: 0.75rem;">
+                                        (<field name="back_pay_tax_monthly" widget="monetary" readonly="1"/> / mo)
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted">Back Pay Pension 7%: </span>
+                                    <span class="fw-bold text-dark">
+                                        <field name="back_pay_pension_total" widget="monetary" readonly="1"/>
+                                    </span>
+                                    <div class="text-muted fst-italic" style="font-size: 0.75rem;">
+                                        (<field name="back_pay_pension_monthly" widget="monetary" readonly="1"/> / mo)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <div>
+                                <label for="allowance_retroactive" string="Total Back Pay (Net Payable)"
+                                       class="small fw-bold text-success"/>
+                                <div class="fs-5 fw-bold text-success">
+                                    <field name="allowance_retroactive" widget="monetary"/>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-1">
+                                <field name="has_pension" widget="boolean_toggle" options="{'autosave': true}"/>
+                                <span class="small text-muted me-2">Pension</span>
+                                <field name="is_back_pay_approved" widget="boolean_toggle" options="{'autosave': true}"/>
+                                <span class="small fw-bold text-muted me-2" invisible="is_back_pay_approved">Pending Approval</span>
+                                <span class="badge text-bg-success" invisible="not is_back_pay_approved">
+                                    <i class="fa fa-check me-1" title="Approved"/>Approved
+                                </span>
+                                <button name="action_approve_back_pay" type="object" string="Approve"
+                                        class="btn btn-sm btn-outline-success"
+                                        invisible="is_back_pay_approved or allowance_retroactive == 0"/>
+                                <button name="action_reset_back_pay" type="object" string="Reset"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        invisible="allowance_retroactive == 0 and back_pay_months == 0"/>
+                            </div>
+                        </div>
+                        <field name="back_pay_justification"
+                                placeholder="Reason / justification (e.g. Promotion approved from Tir to Megabit)..."
+                                class="mt-2"/>
+                    </div>
+                    <group>
+                        <field name="back_pay_previous_tax" widget="monetary"/>
+                        <field name="back_pay_previous_pension" widget="monetary"/>
+                        <field name="back_pay_total" widget="monetary" readonly="1"/>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+    <!-- Contract template form (hr.version without employee) -->
+    <record id="hr_version_view_form_back_pay" model="ir.ui.view">
+        <field name="name">hr.version.form.back.pay</field>
+        <field name="model">hr.version</field>
+        <field name="inherit_id" ref="hr.hr_contract_template_form_view"/>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Back Pay (የተከማቸ ጭማሪ)" name="back_pay" groups="hr.group_hr_manager">
+                    <group>
+                        <group>
+                            <field name="back_pay_months"/>
+                            <field name="back_pay_previous_net" widget="monetary"/>
+                            <field name="allowance_retroactive" widget="monetary"/>
+                            <field name="has_pension" widget="boolean_toggle"/>
+                            <field name="is_back_pay_approved" widget="boolean_toggle"/>
+                        </group>
+                        <group>
+                            <field name="back_pay_new_net" widget="monetary" readonly="1"/>
+                            <field name="back_pay_monthly_diff" widget="monetary" readonly="1"/>
+                            <field name="back_pay_total" widget="monetary" readonly="1"/>
+                            <field name="back_pay_tax_total" widget="monetary" readonly="1"/>
+                            <field name="back_pay_pension_total" widget="monetary" readonly="1"/>
+                        </group>
+                    </group>
+                    <field name="back_pay_justification"
+                            placeholder="Reason / justification (e.g. Promotion approved from Tir to Megabit)..."/>
+                    <div class="mt-2">
+                        <button name="action_fetch_previous_payslip" type="object"
+                                string="Fetch Last Slip" class="btn btn-secondary btn-sm"
+                                invisible="not employee_id"/>
+                        <button name="action_approve_back_pay" type="object" string="Approve"
+                                class="btn btn-outline-success btn-sm"
+                                invisible="is_back_pay_approved or allowance_retroactive == 0"/>
+                        <button name="action_reset_back_pay" type="object" string="Reset"
+                                class="btn btn-outline-secondary btn-sm"
+                                invisible="allowance_retroactive == 0 and back_pay_months == 0"/>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

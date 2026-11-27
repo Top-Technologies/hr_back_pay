@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Category for informational / reporting lines (tax & pension on back pay) -->
+        <record id="category_payslip_summary" model="hr.salary.rule.category">
+            <field name="name">Payslip Summary &amp; Informational Reporting (የደመወዝ ማጠቃለያ)</field>
+            <field name="code">SUMMARY</field>
+        </record>
+    </data>
+</odoo>
