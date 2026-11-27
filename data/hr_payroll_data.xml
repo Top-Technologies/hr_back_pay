@@ -5,6 +5,8 @@
         <record id="category_payslip_summary" model="hr.salary.rule.category">
             <field name="name">Payslip Summary &amp; Informational Reporting (የደመወዝ ማጠቃለያ)</field>
             <field name="code">SUMMARY</field>
+            <!-- Must be global: rules are attached to every structure regardless of country -->
+            <field name="country_id" eval="False"/>
         </record>
     </data>
 </odoo>
