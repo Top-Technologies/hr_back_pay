@@ -15,7 +15,12 @@ def _rule_defs(env):
         summary_category = Category.create({
             'name': 'Payslip Summary & Informational Reporting (የደመወዝ ማጠቃለያ)',
             'code': 'SUMMARY',
+            # Global like hr_payroll.ALW — required when rules are added to all structures
+            'country_id': False,
         })
+    elif summary_category.country_id:
+        # Clear country if a previous install left company-country default (blocks multi-country structs)
+        summary_category.country_id = False
 
     return [
         {
